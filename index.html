@@ -218,10 +218,17 @@ window.filterUsers=()=>{const q=document.getElementById('userSearch').value.toLo
 function renderUsers(users){
   if(!users.length){document.getElementById('usersTable').innerHTML='<div class="empty">No users found</div>';return;}
   let h='<table><thead><tr><th>User</th><th>Age</th><th>Location</th><th>Premium</th><th>Status</th><th>Actions</th></tr></thead><tbody>';
-  users.forEach(u=>{const p=u.photos?.[0]?`<img class="avatar" src="${u.photos[0]}" onerror="this.style.display='none'"/>`:`<div class="avatar-placeholder">👤</div>`;h+=`<tr><td><div class="user-cell">${p}<div><div class="user-name">${u.name||'Unknown'}</div><div class="user-id">${u.id.slice(0,8)}</div></div></div></td><td style="color:var(--text-dim)">${u.age||'—'}</td><td style="color:var(--text-dim)">${u.location||'—'}</td><td>${u.isPremium?'<span class="badge badge-yellow">⭐ VIP</span>':'<span style="color:var(--text-faint);font-size:12px">Free</span>'}</td><td><span class="badge ${u.isBanned?'badge-red':'badge-green'}">${u.isBanned?'Banned':'Active'}</span></td><td><button class="btn btn-ghost btn-sm" onclick="openUserModal('${u.id}')">View</button> <button class="btn btn-danger btn-sm" onclick="toggleBan('${u.id}',${!!u.isBanned})">${u.isBanned?'Unban':'Ban'}</button></td></tr>`;});
+  users.forEach(u=>{const p=u.photos?.[0]?`<img class="avatar" src="${u.photos[0]}" onerror="this.style.display='none'"/>`:`<div class="avatar-placeholder">👤</div>`;h+=`<tr><td><div class="user-cell">${p}<div><div class="user-name">${u.name||'Unknown'}</div><div class="user-id">${u.id.slice(0,8)}</div></div></div></td><td style="color:var(--text-dim)">${u.age||'—'}</td><td style="color:var(--text-dim)">${u.location||'—'}</td><td>${u.isPremium?'<span class="badge badge-yellow">⭐ VIP</span>':'<span style="color:var(--text-faint);font-size:12px">Free</span>'}</td><td><span class="badge ${u.isBanned?'badge-red':'badge-green'}">${u.isBanned?'Banned':'Active'}</span></td><td><button class="btn btn-ghost btn-sm" onclick="openUserModal('${u.id}')">View</button> <button class="btn btn-danger btn-sm" onclick="toggleBan('${u.id}',${!!u.isBanned})">${u.isBanned?'Unban':'Ban'}</button> <button class="btn btn-sm" style="background:var(--yellow-dim);color:var(--yellow);border:1px solid var(--yellow)" onclick="togglePremium('${u.id}',${!!u.isPremium})">${u.isPremium?'⭐ Remove VIP':'👑 Give VIP'}</button></td></tr>`;});
   h+='</tbody></table>';
   document.getElementById('usersTable').innerHTML=h;
 }
+window.togglePremium=async(uid,isPremium)=>{
+  try{
+    await updateDoc(doc(db,'users',uid),{isPremium:!isPremium,diamonds:isPremium?0:100});
+    showToast(isPremium?'VIP removed':'VIP granted + 100 💎 added','success');
+    loadUsers();
+  }catch(e){showToast('Error: '+e.message,'error');}
+};
 window.toggleBan=async(uid,isBanned)=>{try{await updateDoc(doc(db,'users',uid),{isBanned:!isBanned});showToast(isBanned?'Unbanned ✓':'Banned ✓',isBanned?'success':'error');loadUsers();}catch(e){showToast('Error: '+e.message,'error');}};
 window.openUserModal=(uid)=>{
   const u=allUsers.find(x=>x.id===uid);if(!u)return;
