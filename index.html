@@ -108,6 +108,7 @@ tr:hover td{background:var(--surface2);}
     <div class="nav-item" onclick="showPage('users')" id="nav-users"><span>👥</span><span>Users</span></div>
     <div class="nav-item" onclick="showPage('reports')" id="nav-reports"><span>🚩</span><span>Reports</span></div>
     <div class="nav-item" onclick="showPage('swipes')" id="nav-swipes"><span>💘</span><span>Swipes</span></div>
+    <div class="nav-item" onclick="showPage('verify')" id="nav-verify"><span>✅</span><span>Verify</span></div>
     <div class="sidebar-footer"><div id="adminEmail"></div><div style="cursor:pointer;color:var(--primary);margin-top:6px" onclick="doLogout()">Sign out →</div></div>
   </div>
   <div class="main">
@@ -129,6 +130,10 @@ tr:hover td{background:var(--surface2);}
     <div class="page" id="page-reports">
       <div class="page-title">Reports</div><div class="page-sub">User reports and flags</div>
       <div class="table-card"><div id="reportsTable"><div class="loading"><div class="spinner"></div>Loading...</div></div></div>
+    </div>
+    <div class="page" id="page-verify">
+      <div class="page-title">Verification</div><div class="page-sub">Review and verify user photos</div>
+      <div class="table-card"><div id="verifyTable"><div class="loading"><div class="spinner"></div>Loading...</div></div></div>
     </div>
     <div class="page" id="page-swipes">
       <div class="page-title">Swipe Activity</div><div class="page-sub">Recent likes and passes</div>
@@ -179,7 +184,7 @@ onAuthStateChanged(auth,user=>{
     document.getElementById('loginPage').style.display='none';
     document.getElementById('adminApp').style.display='flex';
     document.getElementById('adminEmail').textContent=user.email;
-    loadDashboard();loadUsers();loadReports();loadSwipes();
+    loadDashboard();loadUsers();loadReports();loadSwipes();loadVerify();
   }else{
     document.getElementById('loginPage').style.display='flex';
     document.getElementById('adminApp').style.display='none';
@@ -261,6 +266,39 @@ window.loadSwipes=async()=>{
   catch(e){document.getElementById('swipesTable').innerHTML='<div class="empty">No swipes yet</div>';}
 };
 document.getElementById('userModal').addEventListener('click',function(e){if(e.target===this)closeModal();});
+window.loadVerify=async()=>{
+  document.getElementById('verifyTable').innerHTML='<div class="loading"><div class="spinner"></div>Loading...</div>';
+  try{
+    const snap=await getDocs(collection(db,'users'));
+    const pending=snap.docs.map(d=>({id:d.id,...d.data()})).filter(u=>u.verificationPhoto&&u.verificationStatus==='pending');
+    if(!pending.length){document.getElementById('verifyTable').innerHTML='<div class="empty">✅ No pending verifications</div>';return;}
+    let h='<table><thead><tr><th>User</th><th>Photo</th><th>Submitted</th><th>Actions</th></tr></thead><tbody>';
+    pending.forEach(u=>{
+      h+=`<tr>
+        <td><div class="user-cell"><div class="avatar-placeholder">👤</div><div><div class="user-name">${u.name||'Unknown'}</div><div class="user-id">${u.id.slice(0,8)}</div></div></div></td>
+        <td><img src="${u.verificationPhoto}" style="width:60px;height:60px;border-radius:8px;object-fit:cover;border:2px solid var(--border)" /></td>
+        <td style="color:var(--text-dim);font-size:12px">${u.verificationSubmittedAt?new Date(u.verificationSubmittedAt).toLocaleDateString():'—'}</td>
+        <td>
+          <button class="btn btn-sm" style="background:var(--green-dim);color:var(--green);border:1px solid var(--green);margin-right:6px" onclick="verifyUser('${u.id}',true)">✅ Approve</button>
+          <button class="btn btn-danger btn-sm" onclick="verifyUser('${u.id}',false)">❌ Reject</button>
+        </td>
+      </tr>`;
+    });
+    h+='</tbody></table>';
+    document.getElementById('verifyTable').innerHTML=h;
+  }catch(e){document.getElementById('verifyTable').innerHTML='<div class="empty">Failed to load</div>';}
+};
+window.verifyUser=async(uid,approved)=>{
+  try{
+    await updateDoc(doc(db,'users',uid),{
+      verificationStatus: approved?'verified':'rejected',
+      isVerified: approved,
+      verificationReviewedAt: new Date().toISOString(),
+    });
+    showToast(approved?'User verified ✅':'Verification rejected ❌', approved?'success':'error');
+    loadVerify();
+  }catch(e){showToast('Error: '+e.message,'error');}
+};
 </script>
 </body>
 </html>
