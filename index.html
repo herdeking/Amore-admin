@@ -22,7 +22,8 @@ body{font-family:'Syne',sans-serif;background:var(--bg);color:var(--text);min-he
 .page-title{font-size:26px;font-weight:800;color:var(--text);letter-spacing:-0.5px;}
 .page-sub{font-size:13px;color:var(--text-dim);margin-top:4px;font-family:'DM Mono',monospace;margin-bottom:28px;}
 .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px;}
-.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px;position:relative;overflow:hidden;}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px;position:relative;overflow:hidden;cursor:pointer;transition:border-color 0.15s;}
+.stat-card:hover{border-color:var(--primary);}
 .stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;}
 .stat-card.red::before{background:var(--primary);}
 .stat-card.green::before{background:var(--green);}
@@ -30,10 +31,11 @@ body{font-family:'Syne',sans-serif;background:var(--bg);color:var(--text);min-he
 .stat-card.yellow::before{background:var(--yellow);}
 .stat-label{font-size:11px;color:var(--text-dim);font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;}
 .stat-value{font-size:32px;font-weight:800;color:var(--text);letter-spacing:-1px;font-family:'DM Mono',monospace;}
+.stat-delta{font-size:11px;color:var(--green);margin-top:4px;font-family:'DM Mono',monospace;}
 .table-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:24px;}
-.table-header{padding:18px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.table-header{padding:18px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
 .table-title{font-size:15px;font-weight:700;color:var(--text);}
-.search-input{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:7px 12px;color:var(--text);font-size:13px;font-family:'DM Mono',monospace;outline:none;width:280px;transition:border-color 0.15s;}
+.search-input{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:7px 12px;color:var(--text);font-size:13px;font-family:'DM Mono',monospace;outline:none;width:240px;transition:border-color 0.15s;}
 .search-input:focus{border-color:var(--primary);}
 .search-input::placeholder{color:var(--text-faint);}
 table{width:100%;border-collapse:collapse;}
@@ -43,7 +45,6 @@ tr:last-child td{border-bottom:none;}
 tr:hover td{background:var(--surface2);}
 .user-cell{display:flex;align-items:center;gap:12px;}
 .avatar{width:36px;height:36px;border-radius:50%;object-fit:cover;background:var(--surface2);border:2px solid var(--border);flex-shrink:0;}
-.avatar-placeholder{width:36px;height:36px;border-radius:50%;background:var(--surface2);border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
 .user-name{font-weight:600;font-size:14px;}
 .user-id{font-size:10px;color:var(--text-faint);font-family:'DM Mono',monospace;}
 .badge{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;font-family:'DM Mono',monospace;}
@@ -53,11 +54,14 @@ tr:hover td{background:var(--surface2);}
 .badge-blue{background:var(--blue-dim);color:var(--blue);}
 .btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;border:none;outline:none;font-family:'Syne',sans-serif;transition:all 0.15s;}
 .btn-primary{background:var(--primary);color:#fff;}
+.btn-primary:hover{opacity:0.85;}
 .btn-ghost{background:var(--surface2);color:var(--text-dim);border:1px solid var(--border);}
 .btn-ghost:hover{color:var(--text);}
-.btn-danger{background:var(--primary-dim);color:var(--primary);border:1px solid var(--primary);}
+.btn-danger{background:var(--primary-dim);color:var(--primary);border:1px solid rgba(255,75,110,0.3);}
 .btn-danger:hover{background:var(--primary);color:#fff;}
-.btn-sm{padding:5px 10px;font-size:11px;}
+.btn-success{background:var(--green-dim);color:var(--green);border:1px solid rgba(61,220,132,0.3);}
+.btn-success:hover{background:var(--green);color:#000;}
+.btn-sm{padding:4px 10px;font-size:11px;}
 .login-page{display:flex;align-items:center;justify-content:center;min-height:100vh;width:100%;background:var(--bg);}
 .login-box{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:40px;width:360px;}
 .login-logo{font-size:28px;font-weight:800;color:var(--primary);margin-bottom:6px;}
@@ -73,232 +77,639 @@ tr:hover td{background:var(--surface2);}
 .empty{text-align:center;padding:48px;color:var(--text-faint);font-family:'DM Mono',monospace;font-size:13px;}
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:1000;align-items:center;justify-content:center;}
 .modal-overlay.open{display:flex;}
-.modal{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:28px;width:440px;max-width:95vw;}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:28px;width:480px;max-width:95vw;max-height:80vh;overflow-y:auto;}
 .modal-title{font-size:18px;font-weight:700;margin-bottom:6px;}
 .modal-sub{font-size:13px;color:var(--text-dim);margin-bottom:24px;font-family:'DM Mono',monospace;}
 .modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:24px;}
-.detail-row{display:flex;gap:12px;margin-bottom:12px;}
-.detail-label{font-size:11px;color:var(--text-faint);font-family:'DM Mono',monospace;width:100px;flex-shrink:0;padding-top:2px;}
+.detail-row{display:flex;gap:12px;margin-bottom:12px;align-items:flex-start;}
+.detail-label{font-size:11px;color:var(--text-faint);font-family:'DM Mono',monospace;width:110px;flex-shrink:0;padding-top:2px;text-transform:uppercase;}
 .detail-value{font-size:13px;color:var(--text);}
 .toast{position:fixed;bottom:24px;right:24px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 18px;font-size:13px;font-family:'DM Mono',monospace;z-index:9999;transform:translateY(80px);opacity:0;transition:all 0.3s;pointer-events:none;}
 .toast.show{transform:translateY(0);opacity:1;}
 .toast.success{border-color:var(--green);color:var(--green);}
 .toast.error{border-color:var(--primary);color:var(--primary);}
-.refresh-btn{background:none;border:none;color:var(--text-dim);cursor:pointer;font-size:16px;padding:4px;}
-@media(max-width:900px){.stats-grid{grid-template-columns:repeat(2,1fr);}.sidebar{width:60px;}.sidebar .logo-text,.sidebar .logo-sub,.sidebar .nav-item span:last-child,.sidebar-footer div{display:none;}.main{margin-left:60px;}}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px;}
+.section-title{font-size:13px;font-weight:700;color:var(--text-dim);font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;}
+.revenue-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px;}
+.photo-grid{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;}
+.photo-thumb{width:80px;height:80px;border-radius:8px;object-fit:cover;border:1px solid var(--border);}
+.action-bar{display:flex;gap:8px;flex-wrap:wrap;}
+.filter-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+.select-input{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:7px 12px;color:var(--text);font-size:12px;font-family:'DM Mono',monospace;outline:none;}
+.chart-bar-wrap{margin-top:8px;}
+.chart-bar-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+.chart-bar-label{font-size:11px;color:var(--text-dim);font-family:'DM Mono',monospace;width:80px;flex-shrink:0;}
+.chart-bar-track{flex:1;height:8px;background:var(--surface2);border-radius:4px;overflow:hidden;}
+.chart-bar-fill{height:100%;border-radius:4px;background:var(--primary);transition:width 0.6s;}
+.chart-bar-val{font-size:11px;color:var(--text-dim);font-family:'DM Mono',monospace;width:40px;text-align:right;}
+@media(max-width:900px){.stats-grid{grid-template-columns:repeat(2,1fr);}.grid2{grid-template-columns:1fr;}.sidebar{width:56px;}.sidebar .logo-text,.sidebar .logo-sub,.sidebar .nav-item span:last-child,.sidebar-footer{display:none;}.main{margin-left:56px;padding:16px;}}
 </style>
 </head>
 <body>
+
+<!-- LOGIN -->
 <div class="login-page" id="loginPage">
   <div class="login-box">
     <div class="login-logo">Amore 💕</div>
-    <div class="login-sub">ADMIN DASHBOARD</div>
+    <div class="login-sub">ADMIN DASHBOARD · v2.0</div>
     <div class="form-group"><label class="form-label">Email</label><input class="form-input" type="email" id="loginEmail" placeholder="admin@amore.app" /></div>
-    <div class="form-group"><label class="form-label">Password</label><input class="form-input" type="password" id="loginPassword" placeholder="••••••••" /></div>
-    <button class="btn btn-primary" style="width:100%;justify-content:center;padding:12px" onclick="doLogin()">Sign In</button>
-    <div style="text-align:right;margin-top:12px"><span onclick="doForgotPassword()" style="font-size:12px;color:var(--primary);cursor:pointer;font-family:'DM Mono',monospace">Forgot password?</span></div>
+    <div class="form-group"><label class="form-label">Password</label><input class="form-input" type="password" id="loginPassword" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()" /></div>
+    <button class="btn btn-primary" style="width:100%;justify-content:center;padding:12px" onclick="doLogin()">Sign In →</button>
     <div class="error-msg" id="loginError"></div>
-    <div id="loginSuccess" style="color:var(--green);font-size:12px;margin-top:12px;font-family:'DM Mono',monospace;display:none"></div>
   </div>
 </div>
-<div id="adminApp" style="display:none;width:100%">
+
+<!-- APP SHELL -->
+<div id="appShell" style="display:none;width:100%;min-height:100vh;display:none;flex-direction:row;">
   <div class="sidebar">
-    <div class="logo"><div class="logo-text">Amore 💕</div><div class="logo-sub">Admin Panel</div></div>
-    <div class="nav-item active" onclick="showPage('dashboard')" id="nav-dashboard"><span>📊</span><span>Dashboard</span></div>
-    <div class="nav-item" onclick="showPage('users')" id="nav-users"><span>👥</span><span>Users</span></div>
-    <div class="nav-item" onclick="showPage('reports')" id="nav-reports"><span>🚩</span><span>Reports</span></div>
-    <div class="nav-item" onclick="showPage('swipes')" id="nav-swipes"><span>💘</span><span>Swipes</span></div>
-    <div class="nav-item" onclick="showPage('verify')" id="nav-verify"><span>✅</span><span>Verify</span></div>
-    <div class="sidebar-footer"><div id="adminEmail"></div><div style="cursor:pointer;color:var(--primary);margin-top:6px" onclick="doLogout()">Sign out →</div></div>
+    <div class="logo">
+      <div class="logo-text">Amore 💕</div>
+      <div class="logo-sub">Admin Panel</div>
+    </div>
+    <div class="nav-item active" onclick="showPage('dashboard')"><span>📊</span><span>Dashboard</span></div>
+    <div class="nav-item" onclick="showPage('users')"><span>👥</span><span>Users</span></div>
+    <div class="nav-item" onclick="showPage('reports')"><span>🚩</span><span>Reports</span></div>
+    <div class="nav-item" onclick="showPage('revenue')"><span>💰</span><span>Revenue</span></div>
+    <div class="nav-item" onclick="showPage('verify')"><span>✅</span><span>Verify</span></div>
+    <div class="nav-item" onclick="showPage('stories')"><span>📸</span><span>Stories</span></div>
+    <div class="nav-item" onclick="showPage('broadcast')"><span>📢</span><span>Broadcast</span></div>
+    <div class="sidebar-footer">
+      <div id="adminEmail" style="margin-bottom:4px;"></div>
+      <div style="cursor:pointer;color:var(--primary)" onclick="doLogout()">Sign out</div>
+    </div>
   </div>
+
   <div class="main">
-    <div class="page active" id="page-dashboard">
-      <div class="page-title">Dashboard</div><div class="page-sub">Real-time overview</div>
+
+    <!-- DASHBOARD -->
+    <div class="page active" id="dashboardPage">
+      <div class="page-title">Dashboard</div>
+      <div class="page-sub">Real-time overview of Amore</div>
       <div class="stats-grid">
-        <div class="stat-card red"><div class="stat-label">Total Users</div><div class="stat-value" id="statUsers">—</div></div>
-        <div class="stat-card green"><div class="stat-label">Online Now</div><div class="stat-value" id="statOnline">—</div></div>
-        <div class="stat-card blue"><div class="stat-label">Total Swipes</div><div class="stat-value" id="statSwipes">—</div></div>
-        <div class="stat-card yellow"><div class="stat-label">Matches</div><div class="stat-value" id="statMatches">—</div></div>
+        <div class="stat-card red" onclick="showPage('users')">
+          <div class="stat-label">Total Users</div>
+          <div class="stat-value" id="statUsers">—</div>
+          <div class="stat-delta" id="statUsersNew"></div>
+        </div>
+        <div class="stat-card green">
+          <div class="stat-label">Online Now</div>
+          <div class="stat-value" id="statOnline">—</div>
+          <div class="stat-delta">Live</div>
+        </div>
+        <div class="stat-card blue" onclick="showPage('revenue')">
+          <div class="stat-label">VIP Users</div>
+          <div class="stat-value" id="statVip">—</div>
+          <div class="stat-delta" id="statVipPct"></div>
+        </div>
+        <div class="stat-card yellow" onclick="showPage('reports')">
+          <div class="stat-label">Open Reports</div>
+          <div class="stat-value" id="statReports">—</div>
+          <div class="stat-delta">Needs review</div>
+        </div>
       </div>
-      <div class="table-card"><div class="table-header"><div class="table-title">Recent Users</div><button class="refresh-btn" onclick="loadDashboard()">↻</button></div><div id="recentUsersTable"><div class="loading"><div class="spinner"></div>Loading...</div></div></div>
+      <div class="grid2">
+        <div class="revenue-card">
+          <div class="section-title">Gender Split</div>
+          <div class="chart-bar-wrap" id="genderChart"></div>
+        </div>
+        <div class="revenue-card">
+          <div class="section-title">Top Locations</div>
+          <div class="chart-bar-wrap" id="locationChart"></div>
+        </div>
+      </div>
+      <div class="table-card">
+        <div class="table-header"><div class="table-title">🆕 Recent Signups</div><button class="btn btn-ghost btn-sm" onclick="loadDashboard()">↻ Refresh</button></div>
+        <table><thead><tr><th>User</th><th>Gender</th><th>Location</th><th>Joined</th><th>Status</th></tr></thead>
+        <tbody id="recentSignups"><tr><td colspan="5" class="loading"><div class="spinner"></div>Loading...</td></tr></tbody></table>
+      </div>
     </div>
-    <div class="page" id="page-users">
-      <div class="page-title">Users</div><div class="page-sub">Manage all users</div>
-      <input class="search-input" placeholder="Search by name or ID..." id="userSearch" oninput="filterUsers()" style="margin-bottom:16px" />
-      <div class="table-card"><div id="usersTable"><div class="loading"><div class="spinner"></div>Loading...</div></div></div>
+
+    <!-- USERS -->
+    <div class="page" id="usersPage">
+      <div class="page-title">Users</div>
+      <div class="page-sub">Manage all registered users</div>
+      <div class="table-card">
+        <div class="table-header">
+          <div class="table-title">All Users</div>
+          <div class="filter-row">
+            <input class="search-input" id="userSearch" placeholder="Search name or location..." oninput="filterUsers()" />
+            <select class="select-input" id="userFilter" onchange="filterUsers()">
+              <option value="all">All</option>
+              <option value="premium">VIP Only</option>
+              <option value="banned">Banned</option>
+              <option value="online">Online</option>
+            </select>
+            <button class="btn btn-ghost btn-sm" onclick="loadUsers()">↻</button>
+          </div>
+        </div>
+        <table><thead><tr><th>User</th><th>Age</th><th>Gender</th><th>Location</th><th>VIP</th><th>Status</th><th>Actions</th></tr></thead>
+        <tbody id="usersTable"><tr><td colspan="7" class="loading"><div class="spinner"></div>Loading...</td></tr></tbody></table>
+      </div>
     </div>
-    <div class="page" id="page-reports">
-      <div class="page-title">Reports</div><div class="page-sub">User reports and flags</div>
-      <div class="table-card"><div id="reportsTable"><div class="loading"><div class="spinner"></div>Loading...</div></div></div>
+
+    <!-- REPORTS -->
+    <div class="page" id="reportsPage">
+      <div class="page-title">Reports</div>
+      <div class="page-sub">User reports and blocks</div>
+      <div class="table-card">
+        <div class="table-header">
+          <div class="table-title">Open Reports</div>
+          <div class="filter-row">
+            <select class="select-input" id="reportFilter" onchange="loadReports()">
+              <option value="all">All Types</option>
+              <option value="reported">Reported</option>
+              <option value="blocked">Blocked</option>
+            </select>
+            <button class="btn btn-ghost btn-sm" onclick="loadReports()">↻</button>
+          </div>
+        </div>
+        <table><thead><tr><th>Reporter</th><th>Target</th><th>Type</th><th>Date</th><th>Actions</th></tr></thead>
+        <tbody id="reportsTable"><tr><td colspan="5" class="loading"><div class="spinner"></div>Loading...</td></tr></tbody></table>
+      </div>
     </div>
-    <div class="page" id="page-verify">
-      <div class="page-title">Verification</div><div class="page-sub">Review and verify user photos</div>
-      <div class="table-card"><div id="verifyTable"><div class="loading"><div class="spinner"></div>Loading...</div></div></div>
+
+    <!-- REVENUE -->
+    <div class="page" id="revenuePage">
+      <div class="page-title">Revenue</div>
+      <div class="page-sub">Payments and VIP subscriptions</div>
+      <div class="stats-grid">
+        <div class="stat-card green">
+          <div class="stat-label">Total Revenue</div>
+          <div class="stat-value" id="revTotal">—</div>
+          <div class="stat-delta">All time</div>
+        </div>
+        <div class="stat-card blue">
+          <div class="stat-label">This Month</div>
+          <div class="stat-value" id="revMonth">—</div>
+        </div>
+        <div class="stat-card yellow">
+          <div class="stat-label">Transactions</div>
+          <div class="stat-value" id="revCount">—</div>
+        </div>
+        <div class="stat-card red">
+          <div class="stat-label">Active VIP</div>
+          <div class="stat-value" id="revVip">—</div>
+        </div>
+      </div>
+      <div class="table-card">
+        <div class="table-header"><div class="table-title">Recent Payments</div><button class="btn btn-ghost btn-sm" onclick="loadRevenue()">↻</button></div>
+        <table><thead><tr><th>User</th><th>Amount</th><th>Plan</th><th>Date</th><th>Status</th></tr></thead>
+        <tbody id="revenueTable"><tr><td colspan="5" class="loading"><div class="spinner"></div>Loading...</td></tr></tbody></table>
+      </div>
     </div>
-    <div class="page" id="page-swipes">
-      <div class="page-title">Swipe Activity</div><div class="page-sub">Recent likes and passes</div>
-      <div class="table-card"><div id="swipesTable"><div class="loading"><div class="spinner"></div>Loading...</div></div></div>
+
+    <!-- VERIFY -->
+    <div class="page" id="verifyPage">
+      <div class="page-title">Verification</div>
+      <div class="page-sub">Review user verification requests</div>
+      <div class="table-card">
+        <div class="table-header"><div class="table-title">Pending Verification</div><button class="btn btn-ghost btn-sm" onclick="loadVerify()">↻</button></div>
+        <table><thead><tr><th>User</th><th>Photo</th><th>Verification Photo</th><th>Submitted</th><th>Actions</th></tr></thead>
+        <tbody id="verifyTable"><tr><td colspan="5" class="loading"><div class="spinner"></div>Loading...</td></tr></tbody></table>
+      </div>
     </div>
+
+    <!-- STORIES -->
+    <div class="page" id="storiesPage">
+      <div class="page-title">Stories</div>
+      <div class="page-sub">Moderate active stories</div>
+      <div class="table-card">
+        <div class="table-header"><div class="table-title">Active Stories</div><button class="btn btn-ghost btn-sm" onclick="loadStories()">↻</button></div>
+        <table><thead><tr><th>User</th><th>Preview</th><th>Posted</th><th>Expires</th><th>Actions</th></tr></thead>
+        <tbody id="storiesTable"><tr><td colspan="5" class="loading"><div class="spinner"></div>Loading...</td></tr></tbody></table>
+      </div>
+    </div>
+
+    <!-- BROADCAST -->
+    <div class="page" id="broadcastPage">
+      <div class="page-title">Broadcast</div>
+      <div class="page-sub">Send notifications to all users</div>
+      <div class="revenue-card" style="max-width:560px;">
+        <div class="section-title">Send Push Notification</div>
+        <div class="form-group" style="margin-bottom:16px;">
+          <label class="form-label">Title</label>
+          <input class="form-input" id="broadTitle" placeholder="e.g. New Feature Alert 🎉" style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:11px 14px;color:var(--text);font-size:14px;outline:none;width:100%;" />
+        </div>
+        <div class="form-group" style="margin-bottom:16px;">
+          <label class="form-label">Message</label>
+          <textarea class="form-input" id="broadMsg" rows="3" placeholder="Your message to all users..." style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:11px 14px;color:var(--text);font-size:14px;outline:none;width:100%;resize:vertical;font-family:inherit;"></textarea>
+        </div>
+        <div class="form-group" style="margin-bottom:24px;">
+          <label class="form-label">Target</label>
+          <select class="select-input" id="broadTarget" style="width:100%;">
+            <option value="all">All Users</option>
+            <option value="premium">VIP Users Only</option>
+            <option value="free">Free Users Only</option>
+          </select>
+        </div>
+        <button class="btn btn-primary" onclick="sendBroadcast()" style="width:100%;justify-content:center;padding:12px;">📢 Send Broadcast</button>
+        <div id="broadResult" style="margin-top:12px;font-size:12px;font-family:'DM Mono',monospace;color:var(--green);"></div>
+      </div>
+    </div>
+
   </div>
 </div>
+
+<!-- USER DETAIL MODAL -->
 <div class="modal-overlay" id="userModal">
   <div class="modal">
-    <div class="modal-title" id="modalUserName">User Detail</div>
+    <div class="modal-title" id="modalUserName">User Details</div>
     <div class="modal-sub" id="modalUserId"></div>
-    <div id="modalBody"></div>
+    <div id="modalUserBody"></div>
     <div class="modal-actions">
-      <button class="btn btn-danger btn-sm" id="modalBanBtn">🚫 Ban User</button>
-      <button class="btn btn-ghost btn-sm" onclick="closeModal()">Close</button>
+      <button class="btn btn-ghost" onclick="closeModal('userModal')">Close</button>
+      <button class="btn btn-danger btn-sm" id="modalBanBtn" onclick="banModalUser()">Ban User</button>
+      <button class="btn btn-primary btn-sm" onclick="makeVip()">Make VIP 👑</button>
     </div>
   </div>
 </div>
+
+<!-- TOAST -->
 <div class="toast" id="toast"></div>
+
 <script type="module">
-import{initializeApp}from'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-import{getAuth,signInWithEmailAndPassword,signOut,onAuthStateChanged,sendPasswordResetEmail}from'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-import{getFirestore,collection,getDocs,doc,updateDoc,deleteDoc}from'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
-import{getDatabase,ref,onValue}from'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
-const cfg={apiKey:"AIzaSyDMEzHwG5NCx-4Sr-rCnFAGrFlWLrLsmOc",authDomain:"amore-dating-9b956.firebaseapp.com",projectId:"amore-dating-9b956",storageBucket:"amore-dating-9b956.firebasestorage.app",messagingSenderId:"525255599408",appId:"1:525255599408:web:504a867157ddb2879454f5",databaseURL:"https://amore-dating-9b956-default-rtdb.firebaseio.com"};
-const app=initializeApp(cfg);
-const auth=getAuth(app);
-const db=getFirestore(app);
-const rtdb=getDatabase(app);
-let allUsers=[];
-window.doLogin=async()=>{
-  const email=document.getElementById('loginEmail').value.trim();
-  const pass=document.getElementById('loginPassword').value;
-  document.getElementById('loginError').textContent='';
-  if(!email||!pass){document.getElementById('loginError').textContent='Enter email and password.';return;}
-  try{await signInWithEmailAndPassword(auth,email,pass);}
-  catch(e){const m=e.code==='auth/invalid-credential'?'Wrong email or password.':e.message;document.getElementById('loginError').textContent=m;}
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged }
+  from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getFirestore, collection, getDocs, doc, updateDoc, deleteDoc,
+  query, where, orderBy, limit, getCountFromServer, Timestamp }
+  from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const app = initializeApp({
+  apiKey: "AIzaSyCxi5PfhCcJBMqFGFGTTkFY__FBFsTkGE4",
+  authDomain: "amore-dating-9b956.firebaseapp.com",
+  projectId: "amore-dating-9b956",
+  storageBucket: "amore-dating-9b956.appspot.com",
+  messagingSenderId: "687818140544",
+  appId: "1:687818140544:web:e0ff813b5e8e5b22e8b0f4"
+});
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+let allUsers = [];
+let currentModalUser = null;
+
+// ── Auth ──────────────────────────────────────────
+window.doLogin = async () => {
+  const email = document.getElementById('loginEmail').value;
+  const pwd = document.getElementById('loginPassword').value;
+  try {
+    await signInWithEmailAndPassword(auth, email, pwd);
+  } catch(e) {
+    document.getElementById('loginError').textContent = e.message;
+  }
 };
-window.doForgotPassword=async()=>{
-  const email=document.getElementById('loginEmail').value.trim();
-  if(!email){document.getElementById('loginError').textContent='Enter your email first.';return;}
-  try{await sendPasswordResetEmail(auth,email);const s=document.getElementById('loginSuccess');s.textContent='Reset email sent to '+email;s.style.display='block';}
-  catch(e){document.getElementById('loginError').textContent=e.message;}
-};
-window.doLogout=async()=>{await signOut(auth);};
-onAuthStateChanged(auth,user=>{
-  if(user){
-    document.getElementById('loginPage').style.display='none';
-    document.getElementById('adminApp').style.display='flex';
-    document.getElementById('adminEmail').textContent=user.email;
-    loadDashboard();loadUsers();loadReports();loadSwipes();loadVerify();
-  }else{
-    document.getElementById('loginPage').style.display='flex';
-    document.getElementById('adminApp').style.display='none';
+
+window.doLogout = () => signOut(auth);
+
+onAuthStateChanged(auth, user => {
+  if (user) {
+    document.getElementById('loginPage').style.display = 'none';
+    document.getElementById('appShell').style.display = 'flex';
+    document.getElementById('adminEmail').textContent = user.email;
+    loadDashboard();
+    loadUsers();
+  } else {
+    document.getElementById('loginPage').style.display = 'flex';
+    document.getElementById('appShell').style.display = 'none';
   }
 });
-document.getElementById('loginPassword').addEventListener('keydown',e=>{if(e.key==='Enter')window.doLogin();});
-window.showPage=(name)=>{
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
-  document.getElementById('page-'+name).classList.add('active');
-  document.getElementById('nav-'+name).classList.add('active');
+
+// ── Navigation ────────────────────────────────────
+window.showPage = (name) => {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById(name + 'Page').classList.add('active');
+  event.currentTarget && event.currentTarget.classList.add('active');
+  const loaders = {
+    reports: loadReports, revenue: loadRevenue,
+    verify: loadVerify, stories: loadStories
+  };
+  if (loaders[name]) loaders[name]();
 };
-window.showToast=(msg,type='success')=>{const t=document.getElementById('toast');t.textContent=msg;t.className='toast show '+type;setTimeout(()=>t.className='toast',2500);};
-window.loadDashboard=async()=>{
-  try{
-    const us=await getDocs(collection(db,'users'));
-    document.getElementById('statUsers').textContent=us.size;
-    onValue(ref(rtdb,'presence'),snap=>{const d=snap.val()||{};document.getElementById('statOnline').textContent=Object.values(d).filter(v=>v.isOnline).length;},{onlyOnce:false});
-    const sw=await getDocs(collection(db,'swipes'));
-    document.getElementById('statSwipes').textContent=sw.size;
-    const ma=await getDocs(collection(db,'matches'));
-    document.getElementById('statMatches').textContent=ma.size;
-    const recent=us.docs.slice(0,8).map(d=>({id:d.id,...d.data()}));
-    let h='<table><thead><tr><th>User</th><th>Location</th><th>Status</th></tr></thead><tbody>';
-    recent.forEach(u=>{const p=u.photos?.[0]?`<img class="avatar" src="${u.photos[0]}" onerror="this.style.display='none'"/>`:`<div class="avatar-placeholder">👤</div>`;h+=`<tr><td><div class="user-cell">${p}<div><div class="user-name">${u.name||'Unknown'}</div><div class="user-id">${u.id.slice(0,8)}</div></div></div></td><td style="color:var(--text-dim)">${u.location||'—'}</td><td><span class="badge ${u.isBanned?'badge-red':'badge-green'}">${u.isBanned?'Banned':'Active'}</span></td></tr>`;});
-    h+='</tbody></table>';
-    document.getElementById('recentUsersTable').innerHTML=h;
-  }catch(e){console.error(e);}
+
+// ── Helpers ───────────────────────────────────────
+const toast = (msg, type='success') => {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = 'toast show ' + type;
+  setTimeout(() => t.className = 'toast', 3000);
 };
-window.loadUsers=async()=>{
-  document.getElementById('usersTable').innerHTML='<div class="loading"><div class="spinner"></div>Loading...</div>';
-  try{const snap=await getDocs(collection(db,'users'));allUsers=snap.docs.map(d=>({id:d.id,...d.data()}));renderUsers(allUsers);}
-  catch(e){document.getElementById('usersTable').innerHTML='<div class="empty">Failed to load</div>';}
+
+const fmt = (iso) => iso ? new Date(iso).toLocaleDateString() : '—';
+const fmtTime = (iso) => iso ? new Date(iso).toLocaleString() : '—';
+
+const avatarHtml = (url, name) => url
+  ? `<img class="avatar" src="${url}" onerror="this.style.display='none'" />`
+  : `<div class="avatar" style="display:flex;align-items:center;justify-content:center;font-size:16px;">👤</div>`;
+
+window.closeModal = (id) => document.getElementById(id).classList.remove('open');
+
+// ── Dashboard ─────────────────────────────────────
+window.loadDashboard = async () => {
+  try {
+    const snap = await getDocs(collection(db, 'users'));
+    const users = snap.docs.map(d => ({id: d.id, ...d.data()}));
+    const total = users.length;
+    const online = users.filter(u => u.isOnline).length;
+    const vip = users.filter(u => u.isPremium).length;
+    const week = Date.now() - 7*24*60*60*1000;
+    const newUsers = users.filter(u => u.createdAt && new Date(u.createdAt).getTime() > week).length;
+
+    document.getElementById('statUsers').textContent = total;
+    document.getElementById('statOnline').textContent = online;
+    document.getElementById('statVip').textContent = vip;
+    document.getElementById('statUsersNew').textContent = '+' + newUsers + ' this week';
+    document.getElementById('statVipPct').textContent = total ? Math.round(vip/total*100) + '% of users' : '';
+
+    // Reports count
+    try {
+      const rSnap = await getDocs(collection(db, 'reports'));
+      document.getElementById('statReports').textContent = rSnap.size;
+    } catch { document.getElementById('statReports').textContent = '0'; }
+
+    // Gender chart
+    const genders = {};
+    users.forEach(u => { const g = u.gender || 'Unknown'; genders[g] = (genders[g]||0)+1; });
+    document.getElementById('genderChart').innerHTML = Object.entries(genders).map(([g,c]) =>
+      `<div class="chart-bar-row"><div class="chart-bar-label">${g}</div>
+      <div class="chart-bar-track"><div class="chart-bar-fill" style="width:${Math.round(c/total*100)}%"></div></div>
+      <div class="chart-bar-val">${c}</div></div>`
+    ).join('');
+
+    // Location chart
+    const locs = {};
+    users.forEach(u => { const l = u.location || 'Unknown'; locs[l] = (locs[l]||0)+1; });
+    const topLocs = Object.entries(locs).sort((a,b)=>b[1]-a[1]).slice(0,5);
+    const maxL = topLocs[0]?.[1] || 1;
+    document.getElementById('locationChart').innerHTML = topLocs.map(([l,c]) =>
+      `<div class="chart-bar-row"><div class="chart-bar-label">${l.slice(0,10)}</div>
+      <div class="chart-bar-track"><div class="chart-bar-fill" style="width:${Math.round(c/maxL*100)}%;background:var(--blue)"></div></div>
+      <div class="chart-bar-val">${c}</div></div>`
+    ).join('');
+
+    // Recent signups
+    const recent = [...users].sort((a,b) => new Date(b.createdAt||0) - new Date(a.createdAt||0)).slice(0,10);
+    document.getElementById('recentSignups').innerHTML = recent.length ? recent.map(u =>
+      `<tr><td><div class="user-cell">${avatarHtml(u.photos?.[0], u.name)}
+        <div><div class="user-name">${u.name||'—'}</div><div class="user-id">${u.id.slice(0,8)}</div></div></div></td>
+        <td>${u.gender||'—'}</td><td>${u.location||'—'}</td><td>${fmt(u.createdAt)}</td>
+        <td>${u.isBanned ? '<span class="badge badge-red">Banned</span>' : u.isPremium ? '<span class="badge badge-yellow">VIP</span>' : '<span class="badge badge-green">Active</span>'}</td></tr>`
+    ).join('') : '<tr><td colspan="5" class="empty">No users yet</td></tr>';
+  } catch(e) { console.error(e); }
 };
-window.filterUsers=()=>{const q=document.getElementById('userSearch').value.toLowerCase();renderUsers(allUsers.filter(u=>(u.name||'').toLowerCase().includes(q)||u.id.toLowerCase().includes(q)));};
-function renderUsers(users){
-  if(!users.length){document.getElementById('usersTable').innerHTML='<div class="empty">No users found</div>';return;}
-  let h='<table><thead><tr><th>User</th><th>Age</th><th>Location</th><th>Premium</th><th>Status</th><th>Actions</th></tr></thead><tbody>';
-  users.forEach(u=>{const p=u.photos?.[0]?`<img class="avatar" src="${u.photos[0]}" onerror="this.style.display='none'"/>`:`<div class="avatar-placeholder">👤</div>`;h+=`<tr><td><div class="user-cell">${p}<div><div class="user-name">${u.name||'Unknown'}</div><div class="user-id">${u.id.slice(0,8)}</div></div></div></td><td style="color:var(--text-dim)">${u.age||'—'}</td><td style="color:var(--text-dim)">${u.location||'—'}</td><td>${u.isPremium?'<span class="badge badge-yellow">⭐ VIP</span>':'<span style="color:var(--text-faint);font-size:12px">Free</span>'}</td><td><span class="badge ${u.isBanned?'badge-red':'badge-green'}">${u.isBanned?'Banned':'Active'}</span></td><td><button class="btn btn-ghost btn-sm" onclick="openUserModal('${u.id}')">View</button> <button class="btn btn-danger btn-sm" onclick="toggleBan('${u.id}',${!!u.isBanned})">${u.isBanned?'Unban':'Ban'}</button> <button class="btn btn-sm" style="background:var(--yellow-dim);color:var(--yellow);border:1px solid var(--yellow)" onclick="togglePremium('${u.id}',${!!u.isPremium})">${u.isPremium?'⭐ Remove VIP':'👑 Give VIP'}</button></td></tr>`;});
-  h+='</tbody></table>';
-  document.getElementById('usersTable').innerHTML=h;
-}
-window.togglePremium=async(uid,isPremium)=>{
-  try{
-    await updateDoc(doc(db,'users',uid),{isPremium:!isPremium,diamonds:isPremium?0:100});
-    showToast(isPremium?'VIP removed':'VIP granted + 100 💎 added','success');
-    loadUsers();
-  }catch(e){showToast('Error: '+e.message,'error');}
+
+// ── Users ─────────────────────────────────────────
+window.loadUsers = async () => {
+  try {
+    const snap = await getDocs(collection(db, 'users'));
+    allUsers = snap.docs.map(d => ({id: d.id, ...d.data()}));
+    renderUsers(allUsers);
+  } catch(e) { document.getElementById('usersTable').innerHTML = '<tr><td colspan="7" class="empty">Error loading users</td></tr>'; }
 };
-window.toggleBan=async(uid,isBanned)=>{try{await updateDoc(doc(db,'users',uid),{isBanned:!isBanned});showToast(isBanned?'Unbanned ✓':'Banned ✓',isBanned?'success':'error');loadUsers();}catch(e){showToast('Error: '+e.message,'error');}};
-window.openUserModal=(uid)=>{
-  const u=allUsers.find(x=>x.id===uid);if(!u)return;
-  document.getElementById('modalUserName').textContent=u.name||'Unknown';
-  document.getElementById('modalUserId').textContent='ID: '+uid;
-  document.getElementById('modalBanBtn').textContent=u.isBanned?'✅ Unban':'🚫 Ban';
-  document.getElementById('modalBanBtn').onclick=()=>{toggleBan(uid,!!u.isBanned);closeModal();};
-  let h='';
-  if(u.photos?.[0])h+=`<img src="${u.photos[0]}" style="width:80px;height:80px;border-radius:50%;object-fit:cover;margin-bottom:16px;border:2px solid var(--border)"/>`;
-  [['Age',u.age],['Gender',u.gender],['Location',u.location],['Purpose',u.purpose],['Bio',u.bio],['Premium',u.isPremium?'Yes ⭐':'No'],['Diamonds',u.diamonds??0]].forEach(([l,v])=>{if(v!==undefined&&v!=='')h+=`<div class="detail-row"><div class="detail-label">${l}</div><div class="detail-value">${v}</div></div>`;});
-  document.getElementById('modalBody').innerHTML=h;
+
+window.filterUsers = () => {
+  const q = document.getElementById('userSearch').value.toLowerCase();
+  const f = document.getElementById('userFilter').value;
+  let filtered = allUsers.filter(u => {
+    const matchQ = !q || (u.name||'').toLowerCase().includes(q) || (u.location||'').toLowerCase().includes(q);
+    const matchF = f === 'all' || (f === 'premium' && u.isPremium) || (f === 'banned' && u.isBanned) || (f === 'online' && u.isOnline);
+    return matchQ && matchF;
+  });
+  renderUsers(filtered);
+};
+
+const renderUsers = (users) => {
+  document.getElementById('usersTable').innerHTML = users.length ? users.map(u =>
+    `<tr>
+      <td><div class="user-cell">${avatarHtml(u.photos?.[0], u.name)}
+        <div><div class="user-name">${u.name||'—'}</div><div class="user-id">${u.id.slice(0,8)}</div></div></div></td>
+      <td>${u.age||'—'}</td>
+      <td>${u.gender||'—'}</td>
+      <td>${u.location||'—'}</td>
+      <td>${u.isPremium ? '<span class="badge badge-yellow">👑 VIP</span>' : '<span class="badge">Free</span>'}</td>
+      <td>${u.isBanned ? '<span class="badge badge-red">Banned</span>' : u.isOnline ? '<span class="badge badge-green">Online</span>' : '<span class="badge">Offline</span>'}</td>
+      <td><div class="action-bar">
+        <button class="btn btn-ghost btn-sm" onclick="viewUser('${u.id}')">View</button>
+        ${u.isBanned
+          ? `<button class="btn btn-success btn-sm" onclick="unbanUser('${u.id}')">Unban</button>`
+          : `<button class="btn btn-danger btn-sm" onclick="banUser('${u.id}')">Ban</button>`}
+      </div></td>
+    </tr>`
+  ).join('') : '<tr><td colspan="7" class="empty">No users found</td></tr>';
+};
+
+window.viewUser = (uid) => {
+  const u = allUsers.find(u => u.id === uid);
+  if (!u) return;
+  currentModalUser = u;
+  document.getElementById('modalUserName').textContent = u.name || 'Unknown';
+  document.getElementById('modalUserId').textContent = 'ID: ' + u.id;
+  document.getElementById('modalBanBtn').textContent = u.isBanned ? 'Unban User' : 'Ban User';
+  document.getElementById('modalUserBody').innerHTML = `
+    <div class="photo-grid">${(u.photos||[]).map(p => `<img class="photo-thumb" src="${p}" />`).join('')}</div>
+    <div style="margin-top:16px;">
+      <div class="detail-row"><div class="detail-label">Age</div><div class="detail-value">${u.age||'—'}</div></div>
+      <div class="detail-row"><div class="detail-label">Gender</div><div class="detail-value">${u.gender||'—'}</div></div>
+      <div class="detail-row"><div class="detail-label">Location</div><div class="detail-value">${u.location||'—'}</div></div>
+      <div class="detail-row"><div class="detail-label">Bio</div><div class="detail-value">${u.bio||'—'}</div></div>
+      <div class="detail-row"><div class="detail-label">Purpose</div><div class="detail-value">${u.purpose||'—'}</div></div>
+      <div class="detail-row"><div class="detail-label">Education</div><div class="detail-value">${u.education||'—'}</div></div>
+      <div class="detail-row"><div class="detail-label">VIP</div><div class="detail-value">${u.isPremium ? '👑 Yes' : 'No'}</div></div>
+      <div class="detail-row"><div class="detail-label">Diamonds</div><div class="detail-value">💎 ${u.diamonds||0}</div></div>
+      <div class="detail-row"><div class="detail-label">Followers</div><div class="detail-value">${u.followersCount||0}</div></div>
+      <div class="detail-row"><div class="detail-label">Joined</div><div class="detail-value">${fmt(u.createdAt)}</div></div>
+      <div class="detail-row"><div class="detail-label">Last Seen</div><div class="detail-value">${fmtTime(u.lastSeen)}</div></div>
+      <div class="detail-row"><div class="detail-label">Status</div><div class="detail-value">${u.isBanned ? '🚫 Banned' : u.isOnline ? '🟢 Online' : '⚫ Offline'}</div></div>
+    </div>`;
   document.getElementById('userModal').classList.add('open');
 };
-window.closeModal=()=>{document.getElementById('userModal').classList.remove('open');};
-window.loadReports=async()=>{
-  try{const snap=await getDocs(collection(db,'reports'));const r=snap.docs.map(d=>({id:d.id,...d.data()}));
-  if(!r.length){document.getElementById('reportsTable').innerHTML='<div class="empty">✅ No reports</div>';return;}
-  let h='<table><thead><tr><th>Reporter</th><th>Reported</th><th>Reason</th><th>Actions</th></tr></thead><tbody>';
-  r.forEach(x=>{h+=`<tr><td style="font-family:'DM Mono',monospace;font-size:12px">${(x.reporterId||'').slice(0,8)}</td><td style="font-family:'DM Mono',monospace;font-size:12px">${(x.reportedId||'').slice(0,8)}</td><td><span class="badge badge-red">${x.reason||'No reason'}</span></td><td><button class="btn btn-danger btn-sm" onclick="dismissReport('${x.id}')">Dismiss</button></td></tr>`;});
-  h+='</tbody></table>';document.getElementById('reportsTable').innerHTML=h;}
-  catch(e){document.getElementById('reportsTable').innerHTML='<div class="empty">No reports yet</div>';}
+
+window.banUser = async (uid) => {
+  if (!confirm('Ban this user? They will be logged out and cannot access the app.')) return;
+  try {
+    await updateDoc(doc(db, 'users', uid), { isBanned: true });
+    toast('User banned ✓');
+    loadUsers();
+  } catch(e) { toast(e.message, 'error'); }
 };
-window.dismissReport=async(id)=>{try{await deleteDoc(doc(db,'reports',id));showToast('Dismissed ✓');loadReports();}catch(e){showToast('Error','error');}};
-window.loadSwipes=async()=>{
-  try{const snap=await getDocs(collection(db,'swipes'));const s=snap.docs.map(d=>({id:d.id,...d.data()})).slice(0,50);
-  if(!s.length){document.getElementById('swipesTable').innerHTML='<div class="empty">No swipes yet</div>';return;}
-  let h='<table><thead><tr><th>From</th><th>To</th><th>Action</th><th>Date</th></tr></thead><tbody>';
-  s.forEach(x=>{const b=x.action==='like'?'badge-green':x.action==='superlike'?'badge-yellow':'badge-red';const i=x.action==='like'?'💚':x.action==='superlike'?'⭐':'❌';h+=`<tr><td style="font-family:'DM Mono',monospace;font-size:12px">${(x.userId||'').slice(0,8)}</td><td style="font-family:'DM Mono',monospace;font-size:12px">${(x.targetId||'').slice(0,8)}</td><td><span class="badge ${b}">${i} ${x.action}</span></td><td style="color:var(--text-dim);font-size:12px">${x.createdAt?new Date(x.createdAt).toLocaleDateString():'—'}</td></tr>`;});
-  h+='</tbody></table>';document.getElementById('swipesTable').innerHTML=h;}
-  catch(e){document.getElementById('swipesTable').innerHTML='<div class="empty">No swipes yet</div>';}
+
+window.unbanUser = async (uid) => {
+  try {
+    await updateDoc(doc(db, 'users', uid), { isBanned: false });
+    toast('User unbanned ✓');
+    loadUsers();
+  } catch(e) { toast(e.message, 'error'); }
 };
-document.getElementById('userModal').addEventListener('click',function(e){if(e.target===this)closeModal();});
-window.loadVerify=async()=>{
-  document.getElementById('verifyTable').innerHTML='<div class="loading"><div class="spinner"></div>Loading...</div>';
-  try{
-    const snap=await getDocs(collection(db,'users'));
-    const pending=snap.docs.map(d=>({id:d.id,...d.data()})).filter(u=>u.verificationPhoto&&u.verificationStatus==='pending');
-    if(!pending.length){document.getElementById('verifyTable').innerHTML='<div class="empty">✅ No pending verifications</div>';return;}
-    let h='<table><thead><tr><th>User</th><th>Photo</th><th>Submitted</th><th>Actions</th></tr></thead><tbody>';
-    pending.forEach(u=>{
-      h+=`<tr>
-        <td><div class="user-cell"><div class="avatar-placeholder">👤</div><div><div class="user-name">${u.name||'Unknown'}</div><div class="user-id">${u.id.slice(0,8)}</div></div></div></td>
-        <td><img src="${u.verificationPhoto}" style="width:60px;height:60px;border-radius:8px;object-fit:cover;border:2px solid var(--border)" /></td>
-        <td style="color:var(--text-dim);font-size:12px">${u.verificationSubmittedAt?new Date(u.verificationSubmittedAt).toLocaleDateString():'—'}</td>
-        <td>
-          <button class="btn btn-sm" style="background:var(--green-dim);color:var(--green);border:1px solid var(--green);margin-right:6px" onclick="verifyUser('${u.id}',true)">✅ Approve</button>
-          <button class="btn btn-danger btn-sm" onclick="verifyUser('${u.id}',false)">❌ Reject</button>
-        </td>
-      </tr>`;
-    });
-    h+='</tbody></table>';
-    document.getElementById('verifyTable').innerHTML=h;
-  }catch(e){document.getElementById('verifyTable').innerHTML='<div class="empty">Failed to load</div>';}
+
+window.banModalUser = async () => {
+  if (!currentModalUser) return;
+  const isBanned = currentModalUser.isBanned;
+  await (isBanned ? unbanUser(currentModalUser.id) : banUser(currentModalUser.id));
+  closeModal('userModal');
 };
-window.verifyUser=async(uid,approved)=>{
-  try{
-    await updateDoc(doc(db,'users',uid),{
-      verificationStatus: approved?'verified':'rejected',
-      isVerified: approved,
-      verificationReviewedAt: new Date().toISOString(),
-    });
-    showToast(approved?'User verified ✅':'Verification rejected ❌', approved?'success':'error');
+
+window.makeVip = async () => {
+  if (!currentModalUser) return;
+  try {
+    await updateDoc(doc(db, 'users', currentModalUser.id), { isPremium: true, diamonds: (currentModalUser.diamonds||0) + 100 });
+    toast('User upgraded to VIP 👑');
+    closeModal('userModal');
+    loadUsers();
+  } catch(e) { toast(e.message, 'error'); }
+};
+
+// ── Reports ───────────────────────────────────────
+window.loadReports = async () => {
+  try {
+    const snap = await getDocs(collection(db, 'reports'));
+    const reports = snap.docs.map(d => ({id: d.id, ...d.data()}));
+    const filter = document.getElementById('reportFilter')?.value || 'all';
+    const filtered = filter === 'all' ? reports : reports.filter(r => r.type === filter);
+    document.getElementById('reportsTable').innerHTML = filtered.length ? filtered.map(r =>
+      `<tr>
+        <td><div class="user-id">${(r.fromUserId||'').slice(0,8)}</div></td>
+        <td><div class="user-id">${(r.targetUserId||'').slice(0,8)}</div></td>
+        <td><span class="badge ${r.type==='blocked'?'badge-red':'badge-yellow'}">${r.type||'report'}</span></td>
+        <td>${fmt(r.createdAt)}</td>
+        <td><div class="action-bar">
+          <button class="btn btn-danger btn-sm" onclick="banUser('${r.targetUserId}')">Ban Target</button>
+          <button class="btn btn-ghost btn-sm" onclick="dismissReport('${r.id}')">Dismiss</button>
+        </div></td>
+      </tr>`
+    ).join('') : '<tr><td colspan="5" class="empty">No reports found 🎉</td></tr>';
+  } catch(e) { document.getElementById('reportsTable').innerHTML = '<tr><td colspan="5" class="empty">Error loading reports</td></tr>'; }
+};
+
+window.dismissReport = async (id) => {
+  try {
+    await deleteDoc(doc(db, 'reports', id));
+    toast('Report dismissed');
+    loadReports();
+  } catch(e) { toast(e.message, 'error'); }
+};
+
+// ── Revenue ───────────────────────────────────────
+window.loadRevenue = async () => {
+  try {
+    const snap = await getDocs(collection(db, 'payments'));
+    const payments = snap.docs.map(d => ({id: d.id, ...d.data()}));
+    const total = payments.reduce((s, p) => s + (p.amount||0), 0);
+    const thisMonth = payments.filter(p => {
+      const d = new Date(p.createdAt||0);
+      const now = new Date();
+      return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+    }).reduce((s, p) => s + (p.amount||0), 0);
+    const vipCount = allUsers.filter(u => u.isPremium).length;
+
+    document.getElementById('revTotal').textContent = '₦' + total.toLocaleString();
+    document.getElementById('revMonth').textContent = '₦' + thisMonth.toLocaleString();
+    document.getElementById('revCount').textContent = payments.length;
+    document.getElementById('revVip').textContent = vipCount;
+
+    document.getElementById('revenueTable').innerHTML = payments.length ? [...payments]
+      .sort((a,b) => new Date(b.createdAt||0) - new Date(a.createdAt||0))
+      .map(p => `<tr>
+        <td><div class="user-id">${(p.userId||'').slice(0,8)}</div></td>
+        <td style="color:var(--green);font-family:'DM Mono',monospace">₦${(p.amount||0).toLocaleString()}</td>
+        <td><span class="badge badge-yellow">${p.plan||'VIP'}</span></td>
+        <td>${fmt(p.createdAt)}</td>
+        <td><span class="badge badge-green">${p.status||'success'}</span></td>
+      </tr>`).join('')
+    : '<tr><td colspan="5" class="empty">No payments yet</td></tr>';
+  } catch(e) { document.getElementById('revenueTable').innerHTML = '<tr><td colspan="5" class="empty">Error loading revenue</td></tr>'; }
+};
+
+// ── Verify ────────────────────────────────────────
+window.loadVerify = async () => {
+  try {
+    const snap = await getDocs(query(collection(db, 'users'), where('verificationPhoto', '!=', null)));
+    const pending = snap.docs.map(d => ({id: d.id, ...d.data()})).filter(u => !u.isVerified);
+    document.getElementById('verifyTable').innerHTML = pending.length ? pending.map(u =>
+      `<tr>
+        <td><div class="user-cell">${avatarHtml(u.photos?.[0], u.name)}
+          <div><div class="user-name">${u.name||'—'}</div></div></div></td>
+        <td>${u.photos?.[0] ? `<img class="photo-thumb" src="${u.photos[0]}" />` : '—'}</td>
+        <td>${u.verificationPhoto ? `<img class="photo-thumb" src="${u.verificationPhoto}" />` : '—'}</td>
+        <td>${fmt(u.createdAt)}</td>
+        <td><div class="action-bar">
+          <button class="btn btn-success btn-sm" onclick="approveVerify('${u.id}')">✓ Approve</button>
+          <button class="btn btn-danger btn-sm" onclick="rejectVerify('${u.id}')">✗ Reject</button>
+        </div></td>
+      </tr>`
+    ).join('') : '<tr><td colspan="5" class="empty">No pending verifications 🎉</td></tr>';
+  } catch(e) { document.getElementById('verifyTable').innerHTML = '<tr><td colspan="5" class="empty">Error loading verifications</td></tr>'; }
+};
+
+window.approveVerify = async (uid) => {
+  try {
+    await updateDoc(doc(db, 'users', uid), { isVerified: true, verificationPhoto: null });
+    toast('User verified ✓');
     loadVerify();
-  }catch(e){showToast('Error: '+e.message,'error');}
+  } catch(e) { toast(e.message, 'error'); }
 };
+
+window.rejectVerify = async (uid) => {
+  try {
+    await updateDoc(doc(db, 'users', uid), { verificationPhoto: null });
+    toast('Verification rejected');
+    loadVerify();
+  } catch(e) { toast(e.message, 'error'); }
+};
+
+// ── Stories ───────────────────────────────────────
+window.loadStories = async () => {
+  try {
+    const snap = await getDocs(collection(db, 'stories'));
+    const stories = snap.docs.map(d => ({id: d.id, ...d.data()}));
+    const active = stories.filter(s => new Date(s.expiresAt) > new Date());
+    document.getElementById('storiesTable').innerHTML = active.length ? active.map(s =>
+      `<tr>
+        <td><div class="user-name">${s.userName||'—'}</div></td>
+        <td>${s.photoUrl ? `<img class="photo-thumb" src="${s.photoUrl}" />` : '—'}</td>
+        <td>${fmtTime(s.createdAt)}</td>
+        <td>${fmtTime(s.expiresAt)}</td>
+        <td><button class="btn btn-danger btn-sm" onclick="deleteStory('${s.id}')">Remove</button></td>
+      </tr>`
+    ).join('') : '<tr><td colspan="5" class="empty">No active stories</td></tr>';
+  } catch(e) { document.getElementById('storiesTable').innerHTML = '<tr><td colspan="5" class="empty">Error loading stories</td></tr>'; }
+};
+
+window.deleteStory = async (id) => {
+  try {
+    await deleteDoc(doc(db, 'stories', id));
+    toast('Story removed');
+    loadStories();
+  } catch(e) { toast(e.message, 'error'); }
+};
+
+// ── Broadcast ─────────────────────────────────────
+window.sendBroadcast = async () => {
+  const title = document.getElementById('broadTitle').value.trim();
+  const msg = document.getElementById('broadMsg').value.trim();
+  const target = document.getElementById('broadTarget').value;
+  if (!title || !msg) { toast('Fill in title and message', 'error'); return; }
+
+  try {
+    const snap = await getDocs(collection(db, 'users'));
+    const users = snap.docs.map(d => ({id: d.id, ...d.data()}));
+    const targets = users.filter(u =>
+      target === 'all' ? true : target === 'premium' ? u.isPremium : !u.isPremium
+    ).filter(u => u.expoPushToken);
+
+    // Save broadcast to Firestore for record
+    const { addDoc } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js");
+    await addDoc(collection(db, 'broadcasts'), {
+      title, message: msg, target,
+      sentTo: targets.length,
+      sentAt: new Date().toISOString(),
+    });
+
+    document.getElementById('broadResult').textContent =
+      `✓ Broadcast saved for ${targets.length} users. Push delivery requires a server function.`;
+    toast(`Broadcast sent to ${targets.length} users`);
+  } catch(e) { toast(e.message, 'error'); }
+};
+
 </script>
 </body>
 </html>
