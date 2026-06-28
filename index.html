@@ -697,17 +697,65 @@ window.sendBroadcast = async () => {
       target === 'all' ? true : target === 'premium' ? u.isPremium : !u.isPremium
     ).filter(u => u.expoPushToken);
 
+    // Send via OneSignal to all subscribed users
+    const osTargets = users.filter(u =>
+      target === 'all' ? true : target === 'premium' ? u.isPremium : !u.isPremium
+    ).filter(u => u.osPlayerId).map(u => u.osPlayerId);
+
+    let sent = 0;
+    if (osTargets.length > 0) {
+      try {
+        const res = await fetch('https://onesignal.com/api/v1/notifications', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Basic os_v2_app_2sevqzpodbbvhgwmafoirajvzwqwgrnp62ueabesc3aqfu2uus6idqps3d7wyvkrjoqzxqkddvjefeo2et3x5lgoaohmtu2dll73i4q',
+          },
+          body: JSON.stringify({
+            app_id: 'd4895865-ee18-4353-9acc-015c888135cd',
+            include_player_ids: osTargets,
+            headings: { en: title },
+            contents: { en: msg },
+            priority: 10,
+          }),
+        });
+        const data = await res.json();
+        sent = data.recipients ?? osTargets.length;
+      } catch(e) { console.log('OneSignal error:', e); }
+    }
+
+    // Also send Expo push to remaining users
+    const expoTargets = users.filter(u =>
+      target === 'all' ? true : target === 'premium' ? u.isPremium : !u.isPremium
+    ).filter(u => u.pushToken && u.pushToken.startsWith('ExponentPushToken'));
+
+    for (const u of expoTargets) {
+      try {
+        await fetch('https://exp.host/--/api/v2/push/send', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            to: u.pushToken,
+            title,
+            body: msg,
+            sound: 'default',
+            priority: 'high',
+          }),
+        });
+      } catch {}
+    }
+
     // Save broadcast to Firestore for record
     const { addDoc } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js");
     await addDoc(collection(db, 'broadcasts'), {
       title, message: msg, target,
-      sentTo: targets.length,
+      sentTo: sent + expoTargets.length,
       sentAt: new Date().toISOString(),
     });
 
     document.getElementById('broadResult').textContent =
-      `✓ Broadcast saved for ${targets.length} users. Push delivery requires a server function.`;
-    toast(`Broadcast sent to ${targets.length} users`);
+      `✓ Broadcast sent to ${sent} OneSignal + ${expoTargets.length} Expo users!`;
+    toast(`Broadcast sent to ${sent + expoTargets.length} users`);
   } catch(e) { toast(e.message, 'error'); }
 };
 
